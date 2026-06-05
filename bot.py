@@ -21,7 +21,7 @@ ADMIN_IDS = [5439940299]  # Твой Telegram ID
 DAILY_LIMIT = 100000  # Дневной лимит токенов
 
 # ================= НАСТРОЙКИ CODEX.SALE API =================
-API_KEY = "sk-clb-cOqQjd24MYStR5-wn6EW5FEJDtlwxeiGNbztbuZi4j"  # Твой API ключ
+API_KEY = "sk-clb-cOqQjd24MYStR5-wn6EW5FEJDtlwxeiGNbztbuZi4jY"  # Твой API ключ
 BASE_URL = "https://codex.sale"
 
 # Эндпоинты
