@@ -855,16 +855,14 @@ async def cmd_start(message: Message):
     
     await message.answer(
         f"✨ Привет, {message.from_user.first_name}!\n\n"
-        f"🤖 Я работаю через API codex.sale\n\n"
         f"💰 Дневной лимит: {balance_info['daily']} / {DAILY_LIMIT}\n"
         f"💎 Админские токены: {balance_info['admin']}\n"
         f"📊 Всего токенов: {balance_info['total']}\n\n"
         f"🧠 Модель: {model_info['name']} (x{model_info['multiplier']})\n"
         f"⚡ Скорость: {priority_info['emoji']} {priority_info['name']} (x{priority_info['multiplier']})\n\n"
         f"📝 Просто напиши сообщение или отправь фото!\n\n"
-        f"🖼 GPT-IMAGE 2: текст → генерация, фото + подпись → редактирование\n\n"
+        f"🖼 GPT-IMAGE 2: генерация фото + редактирование\n\n"
         f"📅 Дневной лимит обновляется каждые 24 часа!\n"
-        f"💎 Админские токены накапливаются и не сгорают.\n\n"
         f"🔽 Используйте кнопки внизу для навигации:",
         reply_markup=get_main_reply_keyboard(user_id)
     )
