@@ -687,82 +687,66 @@ async def buy_tokens(callback: CallbackQuery):
     await safe_edit_message(callback, text, builder.as_markup())
     await callback.answer()
 
-# ================= АДМИН ПАНЕЛЬ =================
+# ================= АДМИН ПАНЕЛЬ (МИНИМАЛЬНАЯ ВЕРСИЯ) =================
 
-@dp.callback_query(F.data == "admin_panel")
+@dp.callback_query(lambda c: c.data == "admin_panel")
 async def admin_panel(callback: CallbackQuery):
-    """Открыть админ панель"""
+    print("🔍 Админ панель вызвана!")  # Диагностика
     if callback.from_user.id not in ADMIN_IDS:
         await callback.answer("⛔ Нет доступа", show_alert=True)
         return
-    await safe_edit_message(callback, "🛠 Админ панель:", get_admin_keyboard())
+    await callback.message.edit_text("🛠 Админ панель:", reply_markup=get_admin_keyboard())
     await callback.answer()
 
-@dp.callback_query(F.data == "admin_list")
-async def admin_list(callback: CallbackQuery):
-    if callback.from_user.id not in ADMIN_IDS:
-        await callback.answer("⛔ Нет доступа", show_alert=True)
-        return
-    users = get_all_users()
-    text = "👥 Список пользователей:\n\n"
-    for u in users[:20]:
-        text += f"• {u[0]} | @{u[1]} | {u[2]} ток | {'🔴' if u[3] else '🟢'}\n"
-    builder = InlineKeyboardBuilder()
-    builder.button(text="🔙 Назад", callback_data="admin_panel")
-    await safe_edit_message(callback, text, builder.as_markup())
-    await callback.answer()
-
-@dp.callback_query(F.data == "admin_stats")
-async def admin_stats(callback: CallbackQuery):
-    if callback.from_user.id not in ADMIN_IDS:
-        await callback.answer("⛔ Нет доступа", show_alert=True)
-        return
-    users = get_all_users()
-    total = sum(u[2] for u in users)
-    text = f"📊 Статистика:\n\n👥 Всего: {len(users)}\n💰 Баланс: {total} ток\n📈 Средний: {total//len(users) if users else 0}"
-    builder = InlineKeyboardBuilder()
-    builder.button(text="🔙 Назад", callback_data="admin_panel")
-    await safe_edit_message(callback, text, builder.as_markup())
-    await callback.answer()
-
-@dp.callback_query(F.data == "admin_give")
+@dp.callback_query(lambda c: c.data == "admin_give")
 async def admin_give(callback: CallbackQuery, state: FSMContext):
+    print("🔍 Выдача токенов вызвана!")  # Диагностика
     if callback.from_user.id not in ADMIN_IDS:
         await callback.answer("⛔ Нет доступа", show_alert=True)
         return
+    
     await state.clear()
-    await state.update_data(admin_action="give")
+    await state.update_data(action="give")
     await state.set_state(AdminStates.waiting_for_user_id)
+    
     await callback.answer()
-    await callback.message.answer("💰 Введите Telegram ID пользователя для выдачи токенов:")
+    await callback.message.answer("💰 Введите ID пользователя:")
 
-@dp.callback_query(F.data == "admin_take")
+@dp.callback_query(lambda c: c.data == "admin_take")
 async def admin_take(callback: CallbackQuery, state: FSMContext):
+    print("🔍 Забор токенов вызван!")  # Диагностика
     if callback.from_user.id not in ADMIN_IDS:
         await callback.answer("⛔ Нет доступа", show_alert=True)
         return
+    
     await state.clear()
-    await state.update_data(admin_action="take")
+    await state.update_data(action="take")
     await state.set_state(AdminStates.waiting_for_user_id)
+    
     await callback.answer()
-    await callback.message.answer("💰 Введите Telegram ID пользователя для забора токенов:")
+    await callback.message.answer("💰 Введите ID пользователя:")
 
-@dp.callback_query(F.data == "admin_ban")
+@dp.callback_query(lambda c: c.data == "admin_ban")
 async def admin_ban(callback: CallbackQuery, state: FSMContext):
+    print("🔍 Бан вызван!")  # Диагностика
     if callback.from_user.id not in ADMIN_IDS:
         await callback.answer("⛔ Нет доступа", show_alert=True)
         return
+    
     await state.clear()
-    await state.update_data(admin_action="ban")
+    await state.update_data(action="ban")
     await state.set_state(AdminStates.waiting_for_user_id)
+    
     await callback.answer()
-    await callback.message.answer("🚫 Введите Telegram ID пользователя для бана/разбана:")
+    await callback.message.answer("🚫 Введите ID пользователя:")
 
 @dp.message(AdminStates.waiting_for_user_id)
-async def get_user_for_admin(message: Message, state: FSMContext):
+async def get_user_id(message: Message, state: FSMContext):
+    print(f"🔍 Получен ID: {message.text}")  # Диагностика
+    
     user_input = message.text.strip()
     data = await state.get_data()
-    action = data.get('admin_action')
+    action = data.get('action')
     
     # Поиск пользователя
     target_id = None
@@ -770,52 +754,45 @@ async def get_user_for_admin(message: Message, state: FSMContext):
         target_id = int(user_input)
     else:
         clean = user_input.replace('@', '')
-        res = find_user_by_username(clean)
+        conn = sqlite3.connect(DB_NAME)
+        cur = conn.cursor()
+        res = cur.execute('SELECT user_id FROM users WHERE username = ?', (clean,)).fetchone()
+        conn.close()
         if res:
             target_id = res[0]
     
     if not target_id:
-        await message.answer("❌ Пользователь не найден! Попробуйте еще раз или /cancel")
+        await message.answer("❌ Пользователь не найден!")
         return
     
     user = get_user(target_id)
     if not user:
-        await message.answer(f"❌ Пользователь {target_id} не найден в БД")
+        await message.answer(f"❌ Пользователь {target_id} не найден")
         return
     
     if action == "ban":
         new_status = 0 if user[3] == 1 else 1
         set_ban_status(target_id, new_status)
-        await message.answer(f"✅ Пользователь {target_id} (@{user[1]}) {'разбанен' if new_status==0 else 'забанен'}")
+        await message.answer(f"✅ Пользователь {'разбанен' if new_status==0 else 'забанен'}")
         await state.clear()
-        await message.answer("🛠 Админ панель:", reply_markup=get_admin_keyboard())
-    
+        
     elif action in ["give", "take"]:
-        await state.update_data(target_id=target_id, target_name=user[1])
+        await state.update_data(target_id=target_id)
         await state.set_state(AdminStates.waiting_for_token_amount)
-        action_word = "выдать" if action == "give" else "забрать"
-        await message.answer(f"💰 Пользователь: @{user[1]} (ID: {target_id})\nБаланс: {user[2]} ток\n\nВведите количество токенов, чтобы {action_word}:")
+        await message.answer(f"💰 Баланс: {user[2]} токенов\nВведите сумму:")
 
 @dp.message(AdminStates.waiting_for_token_amount)
-async def process_tokens(message: Message, state: FSMContext):
+async def get_token_amount(message: Message, state: FSMContext):
+    print(f"🔍 Получена сумма: {message.text}")  # Диагностика
+    
     if not message.text.isdigit():
         await message.answer("❌ Введите число!")
         return
     
     amount = int(message.text)
-    if amount <= 0:
-        await message.answer("❌ Число должно быть больше 0!")
-        return
-    
     data = await state.get_data()
     target_id = data.get('target_id')
-    target_name = data.get('target_name')
-    action = data.get('admin_action')
-    
-    if not target_id:
-        await message.answer("❌ Ошибка! Начните заново")
-        await state.clear()
-        return
+    action = data.get('action')
     
     user = get_user(target_id)
     old_balance = user[2]
@@ -823,15 +800,13 @@ async def process_tokens(message: Message, state: FSMContext):
     if action == "give":
         new_balance = old_balance + amount
         update_tokens(target_id, new_balance)
-        await message.answer(f"✅ Выдано {amount} токенов @{target_name}\n\nСтарый баланс: {old_balance}\n➕ +{amount}\n💎 Новый: {new_balance}")
-    elif action == "take":
+        await message.answer(f"✅ Выдано {amount} токенов\nНовый баланс: {new_balance}")
+    else:
         new_balance = max(0, old_balance - amount)
-        taken = old_balance - new_balance
         update_tokens(target_id, new_balance)
-        await message.answer(f"✅ Забрано {taken} токенов у @{target_name}\n\nСтарый баланс: {old_balance}\n➖ -{taken}\n💎 Новый: {new_balance}")
+        await message.answer(f"✅ Забрано {amount} токенов\nНовый баланс: {new_balance}")
     
     await state.clear()
-    await message.answer("🛠 Админ панель:", reply_markup=get_admin_keyboard())
 
 # ================= ЗАПУСК =================
 async def main():
