@@ -64,6 +64,7 @@ MODELS = {
         "multiplier": 4.5, 
         "api_name": "gpt-5.5",
         "description": "Мощная модель"
+    }
 }
 
 # Приоритетность запросов
