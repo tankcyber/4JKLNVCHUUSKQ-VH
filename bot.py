@@ -15,7 +15,7 @@ from aiogram.types import Message, CallbackQuery, BufferedInputFile
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 # ================= КОНФИГУРАЦИЯ =================
-BOT_TOKEN = "8857441987:AAFxXSTX1fOiksCuymGDNerV3NNdEeV9Wx4"  # Получи у @BotFather
+BOT_TOKEN = "8821975305:AAEwg9dq3kr7yZuOGRVPJkn9bNINLniBkiM"  # Получи у @BotFather
 ADMIN_IDS = [5439940299]  # Твой Telegram ID
 
 # ================= НАСТРОЙКИ CODEX.SALE API =================
@@ -64,13 +64,6 @@ MODELS = {
         "multiplier": 4.5, 
         "api_name": "gpt-5.5",
         "description": "Мощная модель"
-    },
-    "gpt-image-2": {
-        "name": "GPT-IMAGE 2", 
-        "multiplier": 3.0, 
-        "api_name": "gpt-image-2",
-        "description": "Для изображений"
-    }
 }
 
 # Приоритетность запросов
