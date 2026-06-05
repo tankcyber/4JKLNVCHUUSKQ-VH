@@ -11,7 +11,6 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import Message, CallbackQuery
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-import tiktoken
 
 # ================= КОНФИГУРАЦИЯ =================
 BOT_TOKEN = "8857441987:AAFxXSTX1fOiksCuymGDNerV3NNdEeV9Wx4"  # Получи у @BotFather
