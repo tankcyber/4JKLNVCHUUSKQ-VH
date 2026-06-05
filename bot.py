@@ -15,7 +15,7 @@ from aiogram.types import Message, CallbackQuery, BufferedInputFile
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 # ================= КОНФИГУРАЦИЯ =================
-BOT_TOKEN = "8821975305:AAEwg9dq3kr7yZuOGRVPJkn9bNINLniBkiM"  # Получи у @BotFather
+BOT_TOKEN = "8821975305:AAGyZwlu_5l2f2cD2iizZlQPVzcCXVxWtzY"  # Получи у @BotFather
 ADMIN_IDS = [5439940299]  # Твой Telegram ID
 
 # ================= НАСТРОЙКИ CODEX.SALE API =================
@@ -899,8 +899,6 @@ async def buy_tokens(callback: CallbackQuery):
     text = (
         "💰 Покупка токенов\n\n"
         "📊 Цены:\n"
-        "• 10 000 токенов — 2₽\n"
-        "• 50 000 токенов — 10₽\n"
         "• 100 000 токенов — 20₽\n"
         "• 500 000 токенов — 90₽\n"
         "• 1 000 000 токенов — 150₽\n\n"
