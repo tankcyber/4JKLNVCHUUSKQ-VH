@@ -6,6 +6,7 @@ import sqlite3
 import json
 import re
 import aiohttp
+import tiktoken
 from datetime import datetime
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command, StateFilter
