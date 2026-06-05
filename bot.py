@@ -53,15 +53,15 @@ AUTH_HEADERS = {
 MODELS = {
     "gpt-5.4": {
         "name": "GPT-5.4", 
-        "multiplier": 1.0, 
+        "multiplier": 1.5, 
         "api_name": "gpt-5.4",
         "description": "Базовый тариф"
     },
     "gpt-5.4-mini": {
         "name": "GPT-5.4 Mini", 
-        "multiplier": 0.9, 
+        "multiplier": 1.0, 
         "api_name": "gpt-5.4-mini",
-        "description": "Экономичная модель (скидка 10%)"
+        "description": "Экономичная модель"
     },
     "gpt-5.5": {
         "name": "GPT-5.5", 
